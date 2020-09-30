@@ -106,4 +106,4 @@ transit_tidy_data =
     drop_na(route_name)
 ```
 
-
+`r filter(transit_tidy_data, route_name == "A") %>% distinct(line, station_name) %>% count()` distinct stations serve the A train. Of the stations that serve the A train, `r filter(transit_tidy_data, route_name == "A") %>% filter(ada == TRUE) %>% distinct(line, station_name) %>% count()` are ADA compliant.
