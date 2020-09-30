@@ -157,5 +157,33 @@ snp_tidy =
 
 ```
 
+Clean and tidy unemployment dataset. 
+
+```{r}
+unemploy = 
+  read_csv("./fivethirtyeight_datasets/unemployment.csv") %>%
+  janitor::clean_names()
+
+full_month_df = 
+  tibble(
+      month = tolower(month.abb),
+      month_name = month.name
+  )
+
+unemploy_tidy_data = 
+  pivot_longer(
+    unemploy,
+    jan:dec,
+    names_to = "month",
+    values_to = "unemploy_percent"
+  ) %>%
+  left_join(full_month_df, by = "month") %>%
+  select(-month) %>%
+  relocate(year, month_name) %>%
+  arrange(year, month_name) %>%
+  drop_na(unemploy_percent)
+
+```
+
 
 
