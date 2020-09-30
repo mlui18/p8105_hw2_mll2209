@@ -107,3 +107,38 @@ transit_tidy_data =
 ```
 
 `r filter(transit_tidy_data, route_name == "A") %>% distinct(line, station_name) %>% count()` distinct stations serve the A train. Of the stations that serve the A train, `r filter(transit_tidy_data, route_name == "A") %>% filter(ada == TRUE) %>% distinct(line, station_name) %>% count()` are ADA compliant.
+
+## Problem 3
+
+Clean and tidy pols-month dataset. 
+```{r}
+pols_month = 
+  read_csv("./fivethirtyeight_datasets/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon, sep="-", into = c("year", "month", "day")) %>%
+  mutate_at(
+    vars("month"),
+    as.integer
+    )
+  
+month_df = 
+  tibble(
+    month = 1:12,
+    month_name = month.name
+  )
+
+pols_month_tidy = 
+  left_join(pols_month, month_df, by = "month") %>%
+  select(-month) %>%
+  mutate(
+    president = case_when(
+      prez_gop == 1 ~ "gop",
+      prez_dem == 1 ~ "dem"
+    )
+  ) %>%
+  select(-prez_gop, -prez_dem, -day)
+
+```
+
+
+
