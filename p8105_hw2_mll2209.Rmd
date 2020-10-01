@@ -83,11 +83,9 @@ transit_df =
     janitor::clean_names() %>%
     select(line:entry, vending, ada) %>%
     mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
-  
-
 ```
 
-This dataset contains the variables: line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance. So far, for data cleaning steps I have cleaned the variable names, selected the desired variables from the dataset, and converted the entry variable from character to a logical variable. In this dataset there are `r nrow(transit_df)` rows and `r ncol(transit_df)` columns. The data is not yet tidy however because the routes variable is spread across 11 columns, and instead could be collapsed into one column, and the variable names for the routes contain values (1-11). There are `r distinct(transit_df, line, station_name) %>% count()` distinct stations in this dataset. There are `r filter(transit_df, ada ==TRUE) %>% distinct(line, station_name) %>% count()` stations that are ADA compliant. The proportion of station entrances / exits without vending that allow entrance is `r (filter(transit_df, vending == "NO") %>% filter(entry == TRUE) %>% count()) / (filter(transit_df, vending == "NO") %>% count())`. 
+This dataset contains the variables: line, station name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance. So far, for data cleaning steps I have cleaned the variable names, selected the desired variables from the dataset, and converted the entry variable from character to a logical variable. In this dataset there are `r nrow(transit_df)` rows and `r ncol(transit_df)` columns. The data is not yet tidy however because the routes variable is spread across 11 columns, and instead could be collapsed since they are all different values of the same variable. There are `r distinct(transit_df, line, station_name) %>% count()` distinct stations in this dataset. There are `r filter(transit_df, ada ==TRUE) %>% distinct(line, station_name) %>% count()` stations that are ADA compliant. The proportion of station entrances / exits without vending that allow entrance is `r (filter(transit_df, vending == "NO") %>% filter(entry == TRUE) %>% count()) / (filter(transit_df, vending == "NO") %>% count())`. 
 
 Reformat and tidy data.
 
@@ -195,8 +193,13 @@ pols_snp_data =
   left_join(pols_month_tidy, snp_tidy, by = c("year", "month_name"))
 
 final_data = 
-  left_join(pols_snp_data, unemploy_tidy_data, by = c("year", "month_name"))
+  left_join(pols_snp_data, unemploy_tidy_data, by = c("year", "month_name")) %>%
+   mutate_at(
+    vars("year"),
+    as.numeric
+    )
 ```
 
+In order to merge these 3 datasets into a single data frame using year and month as keys across datasets, I cleaned and tidied each one, made sure they all have the same year and month variable name and data type so that they can merge properly, in addition to cleaning the variable names and relocating and arranging the month and year variables. In the pols-month dataset, there are `r nrow(pols_month_tidy)` observations and `r ncol(pols_month_tidy)` variables, which consist of `r names(pols_month_tidy)`. In the snp dataset, there are `r nrow(snp_tidy)` observations and `r ncol(snp_tidy)` variables, which consist of `r names(snp_tidy)`. In the unemployment dastaset, there are `r nrow(unemploy_tidy_data)` observations and `r ncol(unemploy_tidy_data)` variables, consisting of `r names(unemploy_tidy_data)`. The final dataset consists of `r nrow(final_data)` observations and `r ncol(final_data)` variables. The years in the dataset range from (`r range(pull(final_data, year), na.rm = TRUE)`). The variables that are included in this final dataset are: `r names(final_data)`.  
 
 
